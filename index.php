@@ -36,20 +36,21 @@
             <div class="modal-body">
                 <form action="" method="post" enctype="multipart/form-data">
                     <label for="">Name:</label>
-                    <input type="text" name="name" placeholder="Name" id="name" class="form-control my-2">
+                    <input type="text" name="" placeholder="Name" id="name" class="form-control my-2">
                     <label for="">Gender:</label>
-                    <select name="gender" id="gender" class="form-select my-2">
+                    <select name="" id="gender" class="form-select my-2">
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                     </select>
                     <label for="">Salary:</label>
-                    <input type="text" name="salary" placeholder="Salary" id="salary" class="form-control my-2">
+                    <input type="text" name="" placeholder="Salary" id="salary" class="form-control my-2">
                     <label for="">Profile</label>
                     <input type="file" name="profile" id="choose_profile" class="form-control my-2">
                     <img src="Image/nonProfile.jpg" id="profile_image" width="100px" alt="">
+                    <input type="text" name="" id="profileValue">
                     <div class="mt-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-success">Submit</button>
+                        <button type="button" id="btn-submit" class="btn btn-success">Submit</button>
                     </div>
                 </form>
             </div>
@@ -58,6 +59,47 @@
         </div>
         </div>
     </div>
+
+    <div class="container-fluid mt-5">
+        <div class="col-8 mx-auto">
+            <table class="table table-dark table-hover align-middle text-center">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Gender</th>
+                        <th>Salary</th>
+                        <th>Profile</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                        $connection = new mysqli('localhost','root','','db-php-3-5');
+                        $rs = $connection->query('SELECT * FROM `tbl_ajax`');
+                        while($row = mysqli_fetch_assoc($rs)){
+                            echo  '
+                            <tr>
+                                <td>'.$row['id'].'</td>
+                                <td>'.$row['name'].'</td>
+                                <td>'.$row['gender'].'</td>
+                                <td>'.$row['salary'].'</td>
+                                <td><img src="Image/'.$row['profile'].'" alt="'.$row['profile'].'" width="80px"></td>
+                                <td>
+                                    <button class="btn btn-warning">Update</button>
+                                    <button class="btn btn-danger">Update</button>
+                                </td>
+                            </tr>
+                            
+                            ';
+                        }
+                    ?>
+                    
+                </tbody>
+            </table>
+        </div>
+    </div>
+
 </body>
 <script>
     $(document).ready(function(){
@@ -78,10 +120,50 @@
                 cache:false,
                 processData:false,
                 success:function(respone){
-                    $('#profile_image').attr('src','Image/'+respone);   
+                    $('#profile_image').attr('src','Image/'+respone); 
+                    $('#profileValue').val(respone);  
                 }
             });
         })
+        $('#btn-submit').click(function(){
+            // alert(123);
+            var Name = $('#name').val();
+            var gender = $('#gender').val();
+            var salary = $('#salary').val();
+            var profile = $('#profileValue').val();
+
+            $.ajax({
+                url:'insert.php',
+                data:{
+                    insert_name:Name,
+                    insert_gender:gender,
+                    insert_salary:salary,
+                    insert_profile:profile,
+                },
+                method:'POST',
+                cache:false,
+                success:function(respone){
+                    if(respone){
+                        var txt = `
+                            <tr>
+                                <td>${respone}</td>
+                                <td>${Name}</td>
+                                <td>${gender}</td>
+                                <td>${salary}</td>
+                                <td>
+                                    <img src="Image/${profile}" alt="${profile}" width="80px">
+                                </td>
+                                <td>
+                                    <button class="btn btn-warning">Update</button>
+                                    <button class="btn btn-danger">Update</button>
+                                </td>
+                            </tr>
+                        `;
+                        $('tbody').append(txt);
+                    }
+                }
+            });
+        });
     });
 </script>
 </html>
