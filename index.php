@@ -19,9 +19,9 @@
 </head>
 <body>
     <div class="container-fluid p-4 bg-dark">
-        <h1 class="text-center">Emplyee Management</h1>
+        <h1 class="text-center text-light">Emplyee Management</h1>
         <!-- Button trigger modal -->
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <button type="button"id="btn-open-add" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal">
             + Add Employee
         </button>
 
@@ -35,6 +35,7 @@
             </div>
             <div class="modal-body">
                 <form action="" method="post" enctype="multipart/form-data">
+                    <input type="text" name="" id="txt_id">
                     <label for="">Name:</label>
                     <input type="text" name="" placeholder="Name" id="name" class="form-control my-2">
                     <label for="">Gender:</label>
@@ -50,7 +51,9 @@
                     <input type="text" name="" id="profileValue">
                     <div class="mt-2">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" id="btn-submit" class="btn btn-success">Submit</button>
+                        <button type="button" id="btn-submit" data-bs-dismiss="modal" class="btn btn-success">Submit</button>
+                        <button type="button" id="btn-update" data-bs-dismiss="modal" class="btn btn-warning">Update</button>
+                        <button type="reset" class="btn btn-danger" id="btn-reset">Reset</button>
                     </div>
                 </form>
             </div>
@@ -86,8 +89,8 @@
                                 <td>'.$row['salary'].'</td>
                                 <td><img src="Image/'.$row['profile'].'" alt="'.$row['profile'].'" width="80px"></td>
                                 <td>
-                                    <button class="btn btn-warning">Update</button>
-                                    <button class="btn btn-danger">Update</button>
+                                    <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
+                                    <button class="btn btn-danger">Delete</button>
                                 </td>
                             </tr>
                             
@@ -154,15 +157,84 @@
                                     <img src="Image/${profile}" alt="${profile}" width="80px">
                                 </td>
                                 <td>
-                                    <button class="btn btn-warning">Update</button>
-                                    <button class="btn btn-danger">Update</button>
+                                    <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
+                                    <button class="btn btn-danger">Delete</button>
                                 </td>
                             </tr>
                         `;
                         $('tbody').append(txt);
+                        $('#profile_imageS').attr('src','Image/nonProfile.jpg')
+                        $('#btn-reset').click();
                     }
                 }
             });
+        });
+
+        $('#btn-open-add').click(function(){
+            $('#btn-submit').show();
+            $('#btn-update').hide();
+        })
+        var index = '';
+
+        $('body').on('click','#btn-open-update',function(){
+
+            $('#btn-submit').hide();
+            $('#btn-update').show();
+
+            index = $(this).parents('tr').index();
+            // alert(index)
+            var id = $(this).parents('tr').find('td').eq(0).text();
+            var Name = $(this).parents('tr').find('td').eq(1).text();
+            var gender = $(this).parents('tr').find('td').eq(2).text();
+            var salary = $(this).parents('tr').find('td').eq(3).text();
+            var profile = $(this).parents('tr').find('td').eq(4).find('img').attr('alt');
+            
+            $('#txt_id').val(id);
+            $('#name').val(Name);
+            $('#gender').val(gender);
+            $('#salary').val(salary);
+            $('#profileValue').val(profile);
+            $('#profile_image').attr('src','Image/'+profile);
+
+        })
+        $('#btn-update').click(function(){
+            var id  = $('#txt_id').val();
+            var Name = $('#name').val();
+            var gender = $('#gender').val();
+            var salary = $('#salary').val();
+            var profile = $('#profileValue').val();
+
+            $.ajax({
+                url:'update.php',
+                method:'POST',
+                data:{
+                    update_id:id,
+                    update_name:Name,
+                    update_gender:gender,
+                    update_salary:salary,
+                    update_profile:profile,
+                },
+                cache:false,
+                success:function(respone){
+                    if(respone){
+                        var txt = `
+                            <td>${id}</td>
+                            <td>${Name}</td>
+                            <td>${gender}</td>
+                            <td>${salary}</td>
+                            <td>
+                                <img src="Image/${profile}" alt="${profile}" width="80px">
+                            </td>
+                            <td>
+                                <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
+                                <button class="btn btn-danger">Delete</button>
+                            </td>
+                        `;
+                        $('table').find('tbody').find('tr').eq(index).html(txt);
+                    }
+                }
+            });
+
         });
     });
 </script>
