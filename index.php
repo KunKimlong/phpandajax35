@@ -90,7 +90,7 @@
                                 <td><img src="Image/'.$row['profile'].'" alt="'.$row['profile'].'" width="80px"></td>
                                 <td>
                                     <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
-                                    <button class="btn btn-danger">Delete</button>
+                                    <button remove_id = "'.$row['id'].'" id="btn-delete" class="btn btn-danger">Delete</button>
                                 </td>
                             </tr>
                             
@@ -158,7 +158,7 @@
                                 </td>
                                 <td>
                                     <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
-                                    <button class="btn btn-danger">Delete</button>
+                                    <button remove_id="${respone}" id="btn-delete" class="btn btn-danger">Delete</button>
                                 </td>
                             </tr>
                         `;
@@ -227,12 +227,34 @@
                             </td>
                             <td>
                                 <button id="btn-open-update" data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-warning">Update</button>
-                                <button class="btn btn-danger">Delete</button>
+                                <button remove_id="${respone}" id="btn-delete" class="btn btn-danger">Delete</button>
                             </td>
                         `;
                         $('table').find('tbody').find('tr').eq(index).html(txt);
                     }
                 }
+            });
+
+        });
+
+        $('body').on('click','#btn-delete',function(){
+            var idx = $(this).parents('tr').index();
+            var remove_id = $(this).attr('remove_id');
+
+            $.ajax({
+                url:'remove.php',
+                method:'post',
+                data:{
+                    // remove_id:remove_id,
+                    remove_id,
+                },
+                cache:false,
+                success:function(respone){
+                    if(respone){
+                        $('table').find('tbody').find('tr').eq(idx).remove();
+                    }
+                }
+
             });
 
         });
